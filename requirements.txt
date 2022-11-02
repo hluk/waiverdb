@@ -11,7 +11,7 @@ gssapi
 Flask-Migrate
 
 stomp.py==8.1.0
-cryptography==38.0.1
+cryptography==38.0.3
 
 flask-oidc==1.4.0
 itsdangerous==2.0.1

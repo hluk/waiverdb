@@ -81,8 +81,10 @@ sphinxcontrib-httpdomain = {version = "^1.8.1", optional = true}
 markupsafe = {version = "==2.1.3", optional = true}
 # https://github.com/sphinx-contrib/httpdomain/issues/60
 Werkzeug = {version = "<2.4", optional = true}
-pydantic = "^1.10.7"
-Flask-Pydantic = "^0.11.0"
+pydantic = "^2.1.1"
+# FIXME: Update to a version after Pydantic >=2.0 is supported:
+# https://github.com/bauerji/flask-pydantic/issues/74
+Flask-Pydantic = {git = "https://github.com/jkseppan/flask-pydantic", branch = "pydantic-v2"}
 
 [tool.poetry.extras]
 test = [

@@ -34,6 +34,8 @@ class Config(object):
     # Deprecated permission mapping
     PERMISSION_MAPPING = {}
 
+    FLASK_PYDANTIC_VALIDATION_ERROR_RAISE = True
+
 
 class ProductionConfig(Config):
     DEBUG = False

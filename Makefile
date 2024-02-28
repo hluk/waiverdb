@@ -66,3 +66,7 @@ exec:
 
 sudo:
 	$(PODMAN) exec -u root waiverdb_$(SERVICE)_1 bash -c '$(CMD)'
+
+lock:
+	pdm lock --group :all
+	git add pdm.lock

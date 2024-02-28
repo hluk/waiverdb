@@ -16,26 +16,36 @@ If you plan to fix issues or implement new features, create fork. Then update
     $ git remote rename origin upstream
     $ git remote add origin git@github.com:$USER/waiverdb.git
 
-Install packages required by pip to compile some python packages::
+Install packages required to compile some python packages::
 
     $ sudo dnf install swig openssl-devel cpp gcc
 
 Install dependencies in a virtual environment::
 
-    $ poetry install
+    $ pdm install
 
 Run the server::
 
     $ cp conf/settings.py.example conf/settings.py
-    $ DEV=true poetry run waiverdb run -h localhost -p 5004 --debugger
+    $ DEV=true pdm run waiverdb run -h localhost -p 5004 --debugger
 
 Migrate the db::
 
-    $ DEV=true poetry run waiverdb db upgrade
+    $ DEV=true pdm run waiverdb db upgrade
 
 The server is now running at on `localhost port 5004`_. Consult the
 :ref:`rest-api` for available API calls. All data is stored inside
 ``/var/tmp/waiverdb_db.sqlite``.
+
+
+Updating Dependencies
+=====================
+
+After changing dependencies in ``pyproject.toml``, it is required to update the lock file::
+
+    $ make lock
+
+Do not forget to commit the updated lock file.
 
 
 Adjusting configuration

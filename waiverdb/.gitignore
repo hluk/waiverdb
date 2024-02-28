@@ -5,3 +5,4 @@
 conf/settings.py
 *.sqlite
 *.egg*
+__version__.py

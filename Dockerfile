@@ -1,8 +1,7 @@
 FROM registry.fedoraproject.org/fedora:38 as builder
 
-# hadolint ignore=DL3033,DL4006,SC2039,SC3040
-RUN set -exo pipefail \
-    && mkdir -p /mnt/rootfs \
+# hadolint ignore=DL3033,SC2039
+RUN mkdir -p /mnt/rootfs \
     # install builder dependencies
     && yum install -y \
         --setopt install_weak_deps=false \
@@ -10,14 +9,16 @@ RUN set -exo pipefail \
         --disablerepo=* \
         --enablerepo=fedora,updates \
         gcc \
+        git-core \
         krb5-devel \
         openldap-devel \
+        perl-Digest-SHA \
         python3 \
         python3-devel \
     # install runtime dependencies
     && yum install -y \
         --installroot=/mnt/rootfs \
-        --releasever=38 \
+        --releasever=/ \
         --setopt install_weak_deps=false \
         --nodocs \
         --disablerepo=* \
@@ -26,30 +27,33 @@ RUN set -exo pipefail \
         openldap \
         python3 \
     && yum --installroot=/mnt/rootfs clean all \
-    && rm -rf /mnt/rootfs/var/cache/* /mnt/rootfs/var/log/dnf* /mnt/rootfs/var/log/yum.* \
-    # https://python-poetry.org/docs/master/#installing-with-the-official-installer
-    && curl -sSL https://install.python-poetry.org | python3 - \
-    && python3 -m venv /venv
+    && rm -rf /mnt/rootfs/var/cache/* /mnt/rootfs/var/log/dnf* /mnt/rootfs/var/log/yum.*
 
 ENV \
-    PIP_DEFAULT_TIMEOUT=100 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1 \
     PYTHONFAULTHANDLER=1 \
-    PYTHONHASHSEED=random \
     PYTHONUNBUFFERED=1
 
 WORKDIR /build
+
+# https://pdm-project.org/latest/#installation
+ADD https://pdm-project.org/install-pdm.py install-pdm.py
+ADD https://pdm-project.org/install-pdm.py.sha256 install-pdm.py.sha256
+
+# hadolint ignore=DL4006,SC3040
+RUN set -exo pipefail \
+    && shasum -a 256 -c install-pdm.py.sha256 \
+    && python3 install-pdm.py \
+    && rm install-pdm.py*
+
 COPY . .
 
 # hadolint ignore=SC1091
 RUN set -ex \
-    && export PATH=/root/.local/bin:$PATH \
+    && export PATH=$HOME/.local/bin:$PATH \
+    && python3 -m venv /venv \
     && . /venv/bin/activate \
-    && pip install --no-cache-dir -r requirements.txt \
-    && poetry build --format=wheel \
-    && version=$(poetry version --short) \
-    && pip install --no-cache-dir dist/waiverdb-"$version"-py3*.whl \
+    && pdm install --check --frozen-lockfile --production --no-editable \
+    && pdm cache clear \
     && deactivate \
     && mv /venv /mnt/rootfs \
     && mkdir -p /mnt/rootfs/app /etc/waiverdb \
@@ -74,7 +78,6 @@ LABEL \
 
 ENV \
     PYTHONFAULTHANDLER=1 \
-    PYTHONHASHSEED=random \
     PYTHONUNBUFFERED=1 \
     WEB_CONCURRENCY=8
 

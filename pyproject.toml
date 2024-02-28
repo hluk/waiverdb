@@ -1,112 +1,96 @@
-[tool.poetry]
+[project]
 name = "waiverdb"
-version = "1.4.0"
 description = "An engine for storing waivers against test results"
 authors = [
-  "Red Hat, Inc. and others"
+    {name = "Red Hat, Inc. and others"}
 ]
-license = "GPL-2.0-or-later"
+license = {text = "GPL-2.0-or-later"}
+requires-python = "<3.13,>=3.9"
 readme = "README.md"
-repository = "https://github.com/release-engineering/waiverdb"
-homepage = "https://waiverdb.readthedocs.io/"
+dynamic = ["version"]
+dependencies = [
+    "flask<3.0.0,>=2.2.5",
+    "flask-oidc<2.0.0,>=1.4.0",
+    "Flask-SQLAlchemy<4.0.0,>=3.1.1",
+    "Flask-Cors<5.0.0,>=4.0.0",
+    "Flask-Migrate<5.0.0,>=4.0.5",
 
-include = [
-    "COPYING",
-    "README.md",
-    "conf/*",
-    "conf/client.conf.example",
-    "conf/client_secrets.json",
-    "conf/fedora-messaging-example.toml",
-    "conf/settings.py.example",
-    "conftest.py",
-    "docs/*",
-    "fedmsg.d/*.py",
-    "pytest.ini",
-    "run-dev-server.py",
-    "tests/*.py",
-    "tests/client_secrets.json",
-    "tox.ini",
-    "waiverdb/migrations/*.ini",
-    "waiverdb/migrations/*.mako",
-    "waiverdb/migrations/*.py",
-    "waiverdb/migrations/README",
-    "waiverdb/migrations/versions",
-    "waiverdb/static/*",
-    "waiverdb/templates/*.html",
+    "itsdangerous==2.0.1",
+
+    # causes a problem with OIDC callback (returns 500)
+    "Werkzeug<3.0.0",
+
+    "gssapi<2.0.0,>=1.8.3",
+    "python-ldap<4.0.0,>=3.4.3",
+
+    "SQLAlchemy<3.0,>=2.0",
+    "psycopg2-binary<3.0.0,>=2.9.8",
+
+    "gunicorn<22.0.0,>=21.2.0",
+    "requests<3.0.0,>=2.31.0",
+    "python-dateutil<3.0.0,>=2.8.2",
+
+    # CLI
+    "click<9.0.0,>=8.1.7",
+    "configparser<7.0.0,>=6.0.0",
+    "openidc-client<1.0.0,>=0.6.0",
+    "requests-gssapi<2.0.0,>=1.2.3",
+
+    # Monitoring
+    "prometheus-client<1.0.0,>=0.19.0",
+
+    # Tracing
+    "opentelemetry-api<2.0.0,>=1.21.0",
+    "opentelemetry-exporter-otlp<2.0.0,>=1.21.0",
+    "opentelemetry-instrumentation-flask<1.0,>=0.43b0",
+    "opentelemetry-instrumentation-sqlalchemy<1.0,>=0.43b0",
+
+    # Messaging
+    "fedora-messaging<4.0.0,>=3.4.1",
+    "stomp-py<9.0.0,>=8.1.0",
+
+    # Types
+    "pydantic<2.0.0,>=1.10.14",
+    "Flask-Pydantic<1.0.0,>=0.11.0",
+    "flask-restx<2.0.0,>=1.1.0",
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.8,<3.13"
+[project.urls]
+homepage = "https://waiverdb.readthedocs.io/"
+repository = "https://github.com/release-engineering/waiverdb"
 
-flask = "^2.2.5"
-flask-oidc = "^1.4.0"
-Flask-SQLAlchemy = "^3.1.1"
-Flask-Cors = "^4.0.0"
-Flask-Migrate = "^4.0.5"
-itsdangerous = {version = "==2.0.1", optional = true}
-# causes a problem with OIDC callback (returns 500)
-Werkzeug = {version = "<3.0.0", optional = true}
-
-gssapi = "^1.8.3"
-python-ldap = "^3.4.3"
-
-SQLAlchemy = "^2.0"
-psycopg2-binary = "^2.9.8"
-
-gunicorn = "^21.2.0"
-requests = "^2.31.0"
-python-dateutil = "^2.8.2"
-
-# CLI
-click = "^8.1.7"
-configparser = "^6.0.0"
-openidc-client = "^0.6.0"
-requests-gssapi = "^1.2.3"
-
-# Monitoring
-prometheus_client = "^0.19.0"
-
-# Messaging
-fedora-messaging = "^3.4.1"
-"stomp.py" = "^8.1.0"
-
-# Tests
-flake8 = {version = "^5.0.4", optional = true}
-pytest = {version = "^8.0.0", optional = true}
-pytest-cov = {version = "^4.0.0", optional = true}
-mock = {version = "^5.1.0", optional = true}
-tox = {version = "^4.11.4", optional = true}
-
-# Tracing
-opentelemetry-api = "^1.21.0"
-opentelemetry-exporter-otlp = "^1.21.0"
-opentelemetry-instrumentation-flask = "^0.43b0"
-opentelemetry-instrumentation-sqlalchemy = "^0.43b0"
-
-# Documentation
-sphinx = {version = "^7.1.1", optional = true}
-sphinxcontrib-httpdomain = {version = "^1.8.1", optional = true}
-markupsafe = {version = "==2.1.5", optional = true}
-pydantic = "^1.10.14"
-Flask-Pydantic = "^0.11.0"
-flask-restx = "^1.1.0"
-
-[tool.poetry.extras]
+[project.optional-dependencies]
 test = [
-    "flake8",
-    "pytest",
-    "pytest-cov",
-    "mock",
+    "pytest<9.0.0,>=8.0.0",
+    "pytest-cov<5.0.0,>=4.0.0",
+    "mock<6.0.0,>=5.1.0",
 ]
 docs = [
-    "sphinx",
-    "sphinxcontrib-httpdomain",
+    "sphinx<8.0.0,>=7.1.1",
+    "sphinxcontrib-httpdomain<2.0.0,>=1.8.1",
+    "markupsafe==2.1.5",
 ]
 
-[tool.poetry.scripts]
+[project.scripts]
 waiverdb-cli = "waiverdb.cli:cli"
 waiverdb = "waiverdb.manage:cli"
 
+[tool.pdm.build]
+includes = [
+    "COPYING",
+    "README.md",
+    "conf/",
+    "docs/",
+    "tests/",
+    "tox.ini",
+    "waiverdb/",
+]
+
+[tool.pdm.version]
+source = "scm"
+write_to = "waiverdb/__init__.py"
+write_template = "__version__ = '{}'"
+
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"

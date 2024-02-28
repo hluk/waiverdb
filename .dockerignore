@@ -1,0 +1,4 @@
+/.pdm-python
+/.tox
+/.venv
+/dist

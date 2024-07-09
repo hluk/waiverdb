@@ -27,14 +27,14 @@ WAIVER_PARAMS = '&'.join(
 @pytest.fixture
 def oidc_token(app):
     with app.test_request_context('/api/v1.0/waivers/new'):
-        with mock.patch.object(session, 'oidc_auth_token') as mocked:
-            mocked.return_value = {
+        with mock.patch.dict(session, {'oidc_auth_profile': {
                 'active': True,
                 'username': 'testuser',
                 'preferred_username': 'testuser',
                 'scope': 'openid waiverdb_scope',
-            }
-            yield mocked()
+            }}) as mocked:
+            with mock.patch.dict(session, {'oidc_auth_token': {"access_token": ""}}):
+                yield mocked['oidc_auth_profile']
 
 
 @pytest.fixture
@@ -91,9 +91,10 @@ class TestOIDCAuthentication(object):
     auth_missing_error = "No 'Authorization' header found"
 
     def test_get_user_without_token(self, session):
-        with pytest.raises(Unauthorized) as excinfo:
-            request = mock.MagicMock()
-            waiverdb.auth.get_user(request)
+        with app.test_request_context('/api/v1.0/waivers/new'):
+            with pytest.raises(Unauthorized) as excinfo:
+                request = mock.MagicMock()
+                waiverdb.auth.get_user(request)
         assert self.auth_missing_error in str(excinfo.value)
 
     def test_get_user_with_invalid_token(self, oidc_token, session):
